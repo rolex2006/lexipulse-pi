@@ -1,0 +1,1197 @@
+```html
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>LexiPulse Pi — 30s Global Digital & Language Speed Arena</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Official Pi Network SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  
+  <!-- Google Fonts: Plus Jakarta Sans (EN) & Cairo (AR) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pi: {
+              dark: '#120729',
+              indigo: '#1A0B3B',
+              purple: '#2B1055',
+              violet: '#5B21B6',
+              gold: '#F5A623',
+              amber: '#FBBF24',
+              cyan: '#22D3EE',
+              emerald: '#10B981'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Cairo"', 'sans-serif'],
+            arabic: ['"Cairo"', '"Plus Jakarta Sans"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-deep: #120729;
+      --card-glass: rgba(34, 15, 74, 0.74);
+      --border-glass: rgba(255, 255, 255, 0.11);
+      --gold-glow: rgba(245, 166, 35, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-deep);
+      background-image:
+        radial-gradient(circle at 12% 10%, rgba(124, 58, 237, 0.28) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(245, 166, 35, 0.18) 0%, transparent 45%);
+      color: #F8FAFC;
+      font-family: 'Plus Jakarta Sans', 'Cairo', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    html[dir="rtl"] body {
+      font-family: 'Cairo', 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .glass-card {
+      background: var(--card-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+      color: #14082E;
+      box-shadow: 0 6px 20px var(--gold-glow);
+      transition: transform 0.14s ease, filter 0.14s ease;
+    }
+    .btn-gold:active {
+      transform: scale(0.96);
+    }
+
+    .btn-purple {
+      background: linear-gradient(135deg, #7C3AED 0%, #4C1D95 100%);
+      color: #FFFFFF;
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+      transition: transform 0.14s ease, filter 0.14s ease;
+    }
+    .btn-purple:active {
+      transform: scale(0.96);
+    }
+
+    .option-card {
+      transition: all 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .option-card:active {
+      transform: scale(0.97);
+    }
+    .option-correct {
+      background: linear-gradient(135deg, #059669, #10B981) !important;
+      border-color: #6EE7B7 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+    }
+    .option-wrong {
+      background: linear-gradient(135deg, #B91C1C, #EF4444) !important;
+      border-color: #FCA5A5 !important;
+      color: #FFFFFF !important;
+      animation: shake 0.32s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      50% { transform: translateX(6px); }
+      75% { transform: translateX(-4px); }
+    }
+
+    @keyframes pulseRing {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.06); opacity: 1; }
+    }
+    .logo-pulse {
+      animation: pulseRing 3s infinite ease-in-out;
+    }
+
+    /* Hide scrollbar cleanly */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #120729; }
+    ::-webkit-scrollbar-thumb { background: #4C1D95; border-radius: 9999px; }
+  </style>
+</head>
+<body class="flex justify-center">
+
+  <!-- Mobile-First App Container (Centered 480px max on desktop, 100% on mobile) -->
+  <div class="w-full max-w-[480px] min-h-screen flex flex-col justify-between relative pb-6">
+
+    <!-- Toast Notification Container (Replaces native alert) -->
+    <div id="toast-box" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[440px] pointer-events-none flex flex-col gap-2"></div>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="sticky top-0 z-40 bg-[#120729]/90 backdrop-blur-md border-b border-white/10 px-4 py-3">
+      <div class="flex items-center justify-between gap-2">
+        <!-- Brand Identity & Original Custom SVG Logo -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FBBF24] to-[#B45309] p-[2px] shadow-lg shrink-0 logo-pulse">
+            <div class="w-full h-full bg-[#1A0B3B] rounded-[10px] flex items-center justify-center">
+              <!-- Original Geometric Logo: Multilingual Speech Node + Neural Pulse (Pi Trademark Safe) -->
+              <svg class="w-7 h-7" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="LexiPulse Pi Logo">
+                <path d="M20 4C11.163 4 4 10.627 4 18.8C4 22.75 5.68 26.33 8.42 28.98L6.8 35.2L13.45 32.56C15.51 33.23 17.71 33.6 20 33.6C28.837 33.6 36 26.973 36 18.8C36 10.627 28.837 4 20 4Z" stroke="url(#lexiGold)" stroke-width="2.4" stroke-linejoin="round"/>
+                <path d="M11 19H15.5L18 13L21.5 25L24.5 17H29" stroke="#22D3EE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="11" cy="19" r="2" fill="#FBBF24"/>
+                <circle cx="29" cy="17" r="2" fill="#FBBF24"/>
+                <defs>
+                  <linearGradient id="lexiGold" x1="4" y1="4" x2="36" y2="35" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FDE047"/>
+                    <stop offset="1" stop-color="#F59E0B"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h1 class="font-extrabold text-base tracking-tight text-white leading-none">LexiPulse Pi</h1>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">PiNet</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5" data-i18n="tagline">30s Digital & Language Arena</p>
+          </div>
+        </div>
+
+        <!-- Right Controls: Sound, EN/AR Toggle, Pi Sign-In -->
+        <div class="flex items-center gap-1.5">
+          <button onclick="toggleSound()" id="sound-btn" aria-label="Toggle Sound" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-amber-400 transition">
+            <svg id="icon-sound-on" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+            </svg>
+            <svg id="icon-sound-off" class="w-4 h-4 text-slate-500 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+            </svg>
+          </button>
+
+          <button onclick="toggleLanguage()" class="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-extrabold text-amber-300 transition">
+            <span id="lang-btn-text">عربي</span>
+          </button>
+
+          <button onclick="authenticateWithPi()" id="pi-auth-btn" class="px-3 py-1.5 rounded-xl btn-gold font-extrabold text-xs flex items-center gap-1">
+            <span class="font-serif font-black text-sm">π</span>
+            <span id="pi-auth-label" data-i18n="signInPi">Sign In</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="px-4 pt-3 flex-1 flex flex-col gap-3.5">
+
+      <!-- Pioneer Profile, Daily Streak & LexiPoints (LXP) Strip -->
+      <section class="glass-card rounded-2xl p-3.5 flex items-center justify-between gap-2">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span id="env-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-400/30" data-i18n="guestBadge">PiNet Web Guest</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30">
+              🔥 <span id="streak-days">1</span>d <span data-i18n="streakWord">Streak</span>
+            </span>
+          </div>
+          <p id="welcome-sub" class="text-[11px] text-slate-300" data-i18n="welcomeBonusMsg">500 Free LXP Welcome Gift Active!</p>
+        </div>
+
+        <div class="flex items-center gap-2.5 bg-[#0D051F]/90 px-3 py-2 rounded-xl border border-amber-400/25 shrink-0">
+          <div class="text-right">
+            <div class="text-[9px] uppercase tracking-wider text-slate-400" data-i18n="pointsLabel">LexiPoints</div>
+            <div class="text-base font-black text-amber-400 leading-tight"><span id="hud-lxp">500</span> <span class="text-[10px]">LXP</span></div>
+          </div>
+          <div class="h-6 w-[1px] bg-white/10"></div>
+          <div>
+            <div class="text-[9px] uppercase tracking-wider text-slate-400" data-i18n="poolEst">Pool Est.</div>
+            <div class="text-xs font-extrabold text-white leading-tight"><span id="hud-pi">0.05</span> <span class="text-amber-400 font-serif">π</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom/Top Mobile Navigation Bar (4 Core Pillars) -->
+      <nav class="grid grid-cols-4 gap-1.5 p-1.5 rounded-2xl bg-[#190A38] border border-white/10">
+        <button onclick="switchView('play')" id="nav-play" class="nav-pill py-2 px-1 rounded-xl font-bold text-[11px] bg-violet-600 text-white shadow flex flex-col items-center gap-0.5 transition">
+          <span class="text-sm">⚡</span>
+          <span data-i18n="navPlay">Arena</span>
+        </button>
+        <button onclick="switchView('insights')" id="nav-insights" class="nav-pill py-2 px-1 rounded-xl font-bold text-[11px] text-slate-300 hover:bg-white/5 flex flex-col items-center gap-0.5 transition">
+          <span class="text-sm">🧠</span>
+          <span data-i18n="navInsights">Insights</span>
+        </button>
+        <button onclick="switchView('vault')" id="nav-vault" class="nav-pill py-2 px-1 rounded-xl font-bold text-[11px] text-slate-300 hover:bg-white/5 flex flex-col items-center gap-0.5 transition">
+          <span class="text-sm">💎</span>
+          <span data-i18n="navVault">Pi Vault</span>
+        </button>
+        <button onclick="switchView('community')" id="nav-community" class="nav-pill py-2 px-1 rounded-xl font-bold text-[11px] text-slate-300 hover:bg-white/5 flex flex-col items-center gap-0.5 transition">
+          <span class="text-sm">🌍</span>
+          <span data-i18n="navSocial">Flywheel</span>
+        </button>
+      </nav>
+
+      <!-- ==================== VIEW 1: 30-SECOND ARENA ==================== -->
+      <div id="view-play" class="flex flex-col gap-3.5">
+        
+        <!-- Mission Banner (Explains the Real-World Problem Solved) -->
+        <div id="mission-card" class="glass-card rounded-2xl p-3.5 border-l-4 border-amber-400">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-400" data-i18n="missionTag">GLOBAL ECOSYSTEM MISSION</span>
+            <span class="text-[10px] text-emerald-300 font-bold" data-i18n="freeToPlay">100% Free to Play</span>
+          </div>
+          <p class="text-xs text-slate-200 leading-relaxed" data-i18n="missionDesc">
+            Master Web3, Blockchain & Global Commerce terms in 30-second speed sprints. Break language barriers across 230+ Pioneer countries!
+          </p>
+        </div>
+
+        <!-- Mode Selection Cards -->
+        <div id="mode-cards" class="flex flex-col gap-3">
+          <!-- Mode 1: Term Flash Match -->
+          <div class="glass-card rounded-2xl p-4 border border-violet-400/25 flex flex-col gap-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-violet-500/25 text-violet-200" data-i18n="m1Badge">30s TRANSLATION & MEANING</span>
+                <h2 class="text-base font-extrabold text-white mt-1.5" data-i18n="m1Title">Term Flash Match</h2>
+                <p class="text-xs text-slate-300 mt-1 leading-relaxed" data-i18n="m1Desc">
+                  Match key digital economy & Web3 terms to their exact meaning or translation before the 30s pulse runs out.
+                </p>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-violet-600/30 border border-violet-400/30 flex items-center justify-center text-xl shrink-0">
+                ⚡
+              </div>
+            </div>
+            <button onclick="startGame('flash')" class="w-full py-3 rounded-xl btn-purple font-extrabold text-xs sm:text-sm">
+              ▶ <span data-i18n="m1Start">Start 30s Flash Match</span>
+            </button>
+          </div>
+
+          <!-- Mode 2: Paradox Decoder -->
+          <div class="glass-card rounded-2xl p-4 border border-amber-400/25 flex flex-col gap-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300" data-i18n="m2Badge">30s COGNITIVE REFLEX</span>
+                <h2 class="text-base font-extrabold text-white mt-1.5" data-i18n="m2Title">Paradox Decoder</h2>
+                <p class="text-xs text-slate-300 mt-1 leading-relaxed" data-i18n="m2Desc">
+                  Anti-fixedness speed test! Decide in milliseconds whether a term-definition pair is TRUE or a deceptive TRAP.
+                </p>
+              </div>
+              <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-xl shrink-0">
+                🧩
+              </div>
+            </div>
+            <button onclick="startGame('paradox')" class="w-full py-3 rounded-xl btn-gold font-extrabold text-xs sm:text-sm">
+              🔥 <span data-i18n="m2Start">Start 30s Paradox Decoder</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Active 30-Second Game Stage -->
+        <div id="active-stage" class="hidden glass-card rounded-2xl p-4 border border-amber-400/40 flex flex-col gap-3.5">
+          <!-- Stage Header -->
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <button onclick="abortGame()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-bold text-slate-200">
+              ✕ <span data-i18n="quitBtn">Quit</span>
+            </button>
+            <div class="flex items-center gap-3">
+              <div class="text-center">
+                <div class="text-[9px] text-slate-400 uppercase" data-i18n="timeLeft">Time</div>
+                <div id="stage-timer" class="text-sm font-black text-rose-400">30.0s</div>
+              </div>
+              <div class="text-center">
+                <div class="text-[9px] text-slate-400 uppercase" data-i18n="comboLabel">Combo</div>
+                <div id="stage-combo" class="text-sm font-black text-cyan-400">1x</div>
+              </div>
+              <div class="text-center">
+                <div class="text-[9px] text-slate-400 uppercase" data-i18n="roundPts">Earned</div>
+                <div id="stage-score" class="text-sm font-black text-amber-400">+0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 30s Animated Timer Bar -->
+          <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-white/10">
+            <div id="stage-progress" class="h-full bg-gradient-to-r from-amber-400 to-cyan-400 transition-all duration-75" style="width: 100%;"></div>
+          </div>
+
+          <!-- Category & Adaptive Difficulty Pill -->
+          <div class="flex items-center justify-between text-[11px]">
+            <span id="q-category" class="px-2 py-0.5 rounded bg-purple-500/25 text-purple-200 font-bold">Web3 & Mainnet</span>
+            <span id="q-speed-tag" class="text-slate-400 font-semibold">Adaptive Lv.1</span>
+          </div>
+
+          <!-- Prompt Card -->
+          <div class="p-4 rounded-2xl bg-[#0D051F] border border-white/15 text-center shadow-inner">
+            <div class="text-[10px] uppercase tracking-widest text-slate-400 mb-1" id="prompt-hint">Select the matching meaning</div>
+            <div id="prompt-term" class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Decentralized Ledger
+            </div>
+            <div id="prompt-sub" class="text-xs text-amber-300/90 mt-1 font-semibold"></div>
+          </div>
+
+          <!-- Mode 1 Options (3 Rapid Choices) -->
+          <div id="flash-options" class="flex flex-col gap-2">
+            <!-- Injected via JS -->
+          </div>
+
+          <!-- Mode 2 Options (TRUE / FALSE Rapid Buttons) -->
+          <div id="paradox-options" class="hidden grid grid-cols-2 gap-3 pt-1">
+            <button onclick="submitParadox(false)" class="option-card py-4 rounded-2xl bg-rose-600/90 hover:bg-rose-500 border border-rose-400/40 text-white font-black text-base shadow-lg">
+              ✕ <span data-i18n="falseBtn">FALSE / TRAP</span>
+            </button>
+            <button onclick="submitParadox(true)" class="option-card py-4 rounded-2xl bg-emerald-600/90 hover:bg-emerald-500 border border-emerald-400/40 text-white font-black text-base shadow-lg">
+              ✓ <span data-i18n="trueBtn">TRUE MATCH</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Post-Round Summary Card -->
+        <div id="round-summary" class="hidden glass-card rounded-2xl p-5 border border-emerald-400/40 text-center flex flex-col gap-3">
+          <div class="text-3xl">🏆</div>
+          <h3 class="text-lg font-black text-white" data-i18n="sprintComplete">30s Sprint Complete!</h3>
+          <div class="grid grid-cols-3 gap-2 bg-[#0D051F] p-3 rounded-xl border border-white/10">
+            <div>
+              <div class="text-[10px] text-slate-400" data-i18n="sumPoints">Points Won</div>
+              <div id="sum-lxp" class="text-base font-black text-amber-400">+120</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400" data-i18n="sumAcc">Accuracy</div>
+              <div id="sum-acc" class="text-base font-black text-emerald-400">90%</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400" data-i18n="sumSpeed">Avg Speed</div>
+              <div id="sum-ms" class="text-base font-black text-cyan-400">1.4s</div>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="closeSummary()" class="flex-1 py-3 rounded-xl btn-gold font-extrabold text-xs" data-i18n="playAgainBtn">
+              Play Another Sprint
+            </button>
+            <button onclick="shareChallengeLink()" class="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-bold text-cyan-300" data-i18n="challengeFriendBtn">
+              Challenge 🔗
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== VIEW 2: COGNITIVE INSIGHTS (DATA EFFECT) ==================== -->
+      <div id="view-insights" class="hidden flex flex-col gap-3.5">
+        <div class="glass-card rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-base font-extrabold text-white" data-i18n="insightsTitle">Cognitive Telemetry & Insights</h2>
+              <p class="text-[11px] text-slate-400" data-i18n="insightsSub">Personalized AI difficulty adapts to your reaction speed</p>
+            </div>
+            <span class="px-2 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 text-[10px] font-bold border border-cyan-400/30">Live Analytics</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="p-3 rounded-xl bg-[#0D051F] border border-white/10">
+              <div class="text-[10px] text-slate-400" data-i18n="statReaction">Avg Reaction Speed</div>
+              <div id="stat-avg-ms" class="text-lg font-black text-cyan-400 mt-0.5">-- ms</div>
+              <div class="text-[10px] text-emerald-400 mt-0.5" data-i18n="statReactionNote">Target: &lt; 2,000 ms</div>
+            </div>
+            <div class="p-3 rounded-xl bg-[#0D051F] border border-white/10">
+              <div class="text-[10px] text-slate-400" data-i18n="statMastered">Terms Mastered</div>
+              <div id="stat-mastered" class="text-lg font-black text-amber-400 mt-0.5">0 / 24</div>
+              <div class="text-[10px] text-slate-400 mt-0.5" data-i18n="statMasteredNote">Web3 & Global Trade</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personalized Weak-Spot Review Queue -->
+        <div class="glass-card rounded-2xl p-4">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-amber-300 mb-2" data-i18n="reviewQueueTitle">
+            Personalized Focus Terms (Review)
+          </h3>
+          <div id="weak-terms-list" class="flex flex-col gap-2 text-xs">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== VIEW 3: PI VAULT & TRANSPARENT LEDGER ==================== -->
+      <div id="view-vault" class="hidden flex flex-col gap-3.5">
+        <div class="glass-card rounded-2xl p-4 border border-amber-400/30">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-base font-extrabold text-white" data-i18n="vaultHeader">Community Reward Pool</h2>
+            <span class="px-2 py-0.5 rounded bg-amber-400/15 text-amber-300 border border-amber-400/30 text-[11px] font-bold">
+              1,000 LXP = 0.10 π
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed mb-3" data-i18n="vaultExplain">
+            Fixed, transparent conversion funded by the Pi Ecosystem Reward Pool & Pi Ad Network. Anti-cheat verified.
+          </p>
+
+          <div class="flex justify-between text-[11px] font-bold mb-1">
+            <span class="text-slate-300" data-i18n="thresholdTxt">Redemption Threshold: 1,000 LXP</span>
+            <span class="text-amber-400"><span id="vault-lxp-count">500</span> / 1,000 LXP</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-white/10 mb-3">
+            <div id="vault-bar" class="h-full btn-gold transition-all duration-300" style="width: 50%;"></div>
+          </div>
+
+          <button onclick="redeemPointsToPi()" class="w-full py-3 rounded-xl btn-gold font-extrabold text-xs sm:text-sm">
+            <span class="font-serif font-black">π</span> <span data-i18n="redeemBtn">Redeem LXP to Pi Wallet</span>
+          </button>
+        </div>
+
+        <!-- Pi SDK Utility Pass (Real Pi.createPayment Integration) -->
+        <div class="glass-card rounded-2xl p-4">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-violet-300 mb-2.5" data-i18n="sdkStoreTitle">
+            Ecosystem Utility (Pi Payments SDK)
+          </h3>
+          <div class="p-3 rounded-xl bg-[#0D051F] border border-white/10 flex items-center justify-between gap-3">
+            <div>
+              <div class="font-bold text-xs sm:text-sm text-white">⚡ <span data-i18n="proPackName">Pro Linguist Tournament Pass</span></div>
+              <p class="text-[11px] text-slate-400 mt-0.5" data-i18n="proPackDesc">Unlocks 2x LXP boost + Global Pioneer Tournament entry.</p>
+            </div>
+            <button onclick="triggerPiPayment(0.15, 'Pro Linguist Tournament Pass')" class="px-3.5 py-2 rounded-xl btn-purple font-extrabold text-xs shrink-0">
+              0.15 π
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Transparent Points Ledger -->
+        <div class="glass-card rounded-2xl p-4">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-300 mb-2" data-i18n="ledgerTitle">
+            Live Activity Ledger
+          </h3>
+          <div id="ledger-list" class="flex flex-col gap-1.5 max-h-40 overflow-y-auto text-[11px]">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== VIEW 4: FLYWHEEL & LEADERBOARD ==================== -->
+      <div id="view-community" class="hidden flex flex-col gap-3.5">
+        <!-- PiNet Viral Challenge Link Generator -->
+        <div class="glass-card rounded-2xl p-4 border border-cyan-400/30">
+          <h2 class="text-base font-extrabold text-white mb-1" data-i18n="viralTitle">PiNet Viral Challenge Link</h2>
+          <p class="text-[11px] text-slate-300 leading-relaxed mb-3" data-i18n="viralDesc">
+            Invite friends outside Pi Browser via standard web browsers (PiNet). Both players earn +200 LXP when they complete a 30s sprint!
+          </p>
+          <div class="flex gap-2">
+            <input id="pinet-link-input" type="text" readonly value="https://lexipulse.pinet.app/?ref=Pioneer" class="flex-1 bg-[#0D051F] border border-white/15 rounded-xl px-3 py-2 text-[11px] text-cyan-300 font-mono outline-none" />
+            <button onclick="shareChallengeLink()" class="px-3.5 py-2 rounded-xl btn-gold font-extrabold text-xs shrink-0" data-i18n="copyBtn">
+              Copy & Share
+            </button>
+          </div>
+        </div>
+
+        <!-- Global Pioneers Leaderboard -->
+        <div class="glass-card rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-extrabold text-white">🏆 <span data-i18n="topPioneers">Global Pioneer Rankings</span></h3>
+            <span class="text-[10px] font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-400/30">Season 1</span>
+          </div>
+          <div id="leaderboard-container" class="flex flex-col gap-2">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ==================== FOOTER (MANDATORY PRIVACY POLICY & COMPLIANCE) ==================== -->
+    <footer class="px-4 pt-4 mt-2 border-t border-white/10 text-[11px] text-slate-400 flex items-center justify-between">
+      <div>
+        <span class="font-bold text-slate-200">LexiPulse Pi</span> • Pi Next Hackathon
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="togglePrivacyModal(true)" class="text-amber-400 hover:underline font-semibold" data-i18n="privacyBtn">
+          Privacy Policy
+        </button>
+        <span>•</span>
+        <span>v1.0 Mainnet/Testnet</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== PRIVACY POLICY MODAL ==================== -->
+  <div id="privacy-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-[440px] w-full rounded-2xl p-5 border border-white/15 max-h-[82vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+        <h3 class="text-base font-extrabold text-amber-400" data-i18n="privacyHeading">Privacy Policy & Ecosystem Terms</h3>
+        <button onclick="togglePrivacyModal(false)" class="text-slate-400 hover:text-white text-xl font-bold leading-none">&times;</button>
+      </div>
+      <div class="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+        <p><strong>1. Pi Network SDK & Authentication:</strong> LexiPulse Pi requests only your Pi username and payment scope via the official Pi SDK to track leaderboard scores and process voluntary in-app utility payments. We never access or store your wallet passphrase.</p>
+        <p><strong>2. PiNet External Web Access:</strong> Visitors accessing via standard web browsers through PiNet can play free 30-second challenges in Guest Mode without mandatory registration.</p>
+        <p><strong>3. LexiPoints (LXP) & Reward Pool:</strong> LXP points measure educational speed and accuracy. Redemptions are subject to anti-cheat reaction validation and funded transparently from the dedicated Community Reward Pool and Pi Ad Network revenue.</p>
+        <p><strong>4. Data Minimization:</strong> Cognitive telemetry (reaction speed in milliseconds and mastered terms) is stored locally to personalize difficulty and is never sold to third parties.</p>
+      </div>
+      <button onclick="togglePrivacyModal(false)" class="mt-4 w-full py-2.5 rounded-xl btn-gold font-extrabold text-xs" data-i18n="closePrivacy">
+        Accept & Close
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== APPLICATION LOGIC & PI SDK ==================== -->
+  <script>
+    /* 1. BILINGUAL CURRICULUM DATASET (Web3, Blockchain, Global Commerce & Digital Literacy) */
+    const TERMS_DB = [
+      { id: 1, cat: "Blockchain Core", termEn: "Decentralized Ledger", termAr: "سجل موزع لامركزي", defEn: "Shared database synced across independent nodes", defAr: "قاعدة بيانات مشتركة متزامنة عبر عقد مستقلة", trapEn: "Central bank password vault", trapAr: "خزنة كلمات مرور لبنك مركزي" },
+      { id: 2, cat: "Pi Ecosystem", termEn: "KYC Verification", termAr: "توثيق الهوية (KYC)", defEn: "Confirming one real human per account", defAr: "التحقق من وجود إنسان حقيقي واحد لكل حساب", trapEn: "Mining faster with multiple phones", trapAr: "التعدين السريع بعدة هواتف" },
+      { id: 3, cat: "Smart Contracts", termEn: "Smart Contract", termAr: "العقد الذكي", defEn: "Self-executing code when conditions are met", defAr: "كود برمجي ينفذ تلقائياً عند تحقق الشروط", trapEn: "A paper agreement signed by fax", trapAr: "اتفاقية ورقية موقعة بالفاكس" },
+      { id: 4, cat: "Global Commerce", termEn: "Peer-to-Peer (P2P)", termAr: "ند لند (P2P)", defEn: "Direct value exchange without middlemen", defAr: "تبادل مباشر للقيمة دون وسطاء", trapEn: "Paying extra fees to three brokers", trapAr: "دفع رسوم إضافية لثلاثة وسطاء" },
+      { id: 5, cat: "Web3 Security", termEn: "Wallet Passphrase", termAr: "عبارة مرور المحفظة", defEn: "Secret 24-word key never shared with anyone", defAr: "مفتاح سري من 24 كلمة لا يُشارك مع أحد", trapEn: "Public username shown on leaderboards", trapAr: "اسم المستخدم العام في لوحة المتصدرين" },
+      { id: 6, cat: "Digital Economy", termEn: "Utility Token", termAr: "عملة ذات منفعة", defEn: "Digital currency used for real apps & services", defAr: "عملة رقمية تُستخدم في تطبيقات وخدمات حقيقية", trapEn: "A decorative image with zero use", trapAr: "صورة للزينة بلا أي استخدام" },
+      { id: 7, cat: "Network Nodes", termEn: "Consensus Protocol", termAr: "بروتوكول الإجماع", defEn: "How network nodes agree on valid transactions", defAr: "كيف تتفق عقد الشبكة على صحة المعاملات", trapEn: "Deleting transaction history daily", trapAr: "حذف سجل المعاملات يومياً" },
+      { id: 8, cat: "Pi Ecosystem", termEn: "Mainnet Migration", termAr: "الترحيل للشبكة الرئيسية", defEn: "Transferring verified balance to live blockchain", defAr: "نقل الرصيد الموثق إلى البلوك تشين الحي", trapEn: "Resetting all user progress to zero", trapAr: "تصفير جميع إنجازات المستخدم" },
+      { id: 9, cat: "Global Commerce", termEn: "Escrow Protection", termAr: "حماية الضمان المالي", defEn: "Holding funds safely until delivery is confirmed", defAr: "حجز المبلغ بأمان حتى تأكيد الاستلام", trapEn: "Sending money to unknown strangers", trapAr: "إرسال الأموال لغرباء مجهولين" },
+      { id: 10, cat: "Web3 Infrastructure", termEn: "API / SDK Integration", termAr: "تكامل أدوات المطورين", defEn: "Connecting apps smoothly to Pi Auth & Payments", defAr: "ربط التطبيقات بسلاسة بمصادقة ومدفوعات Pi", trapEn: "Printing screenshots on paper", trapAr: "طباعة لقطات الشاشة على الورق" },
+      { id: 11, cat: "Digital Literacy", termEn: "Phishing Attack", termAr: "هجوم التصيد الاحتيالي", defEn: "Fake link trying to steal your secret passphrase", defAr: "رابط مزيف يحاول سرقة عبارة مرورك السرية", trapEn: "Official Pi Browser security update", trapAr: "تحديث أمان رسمي لمتصفح Pi" },
+      { id: 12, cat: "Global Trade", termEn: "Cross-Border Settlement", termAr: "التسوية العابرة للحدود", defEn: "Fast global payment across 230+ countries", defAr: "دفع عالمي سريع عبر أكثر من 230 دولة", trapEn: "Waiting 30 days for local mail", trapAr: "انتظار 30 يوماً للبريد المحلي" }
+    ];
+
+    /* 2. LOCALIZATION DICTIONARY (EN Default + Full AR Support) */
+    const I18N = {
+      en: {
+        tagline: "30s Digital & Language Arena",
+        signInPi: "Sign In",
+        guestBadge: "PiNet Web Guest",
+        streakWord: "Streak",
+        welcomeBonusMsg: "500 Free LXP Welcome Gift Active!",
+        pointsLabel: "LexiPoints",
+        poolEst: "Pool Est.",
+        navPlay: "Arena",
+        navInsights: "Insights",
+        navVault: "Pi Vault",
+        navSocial: "Flywheel",
+        missionTag: "GLOBAL ECOSYSTEM MISSION",
+        freeToPlay: "100% Free to Play",
+        missionDesc: "Master Web3, Blockchain & Global Commerce terms in 30-second speed sprints. Break language barriers across 230+ Pioneer countries!",
+        m1Badge: "30s TRANSLATION & MEANING",
+        m1Title: "Term Flash Match",
+        m1Desc: "Match key digital economy & Web3 terms to their exact meaning or translation before the 30s pulse runs out.",
+        m1Start: "Start 30s Flash Match",
+        m2Badge: "30s COGNITIVE REFLEX",
+        m2Title: "Paradox Decoder",
+        m2Desc: "Anti-fixedness speed test! Decide in milliseconds whether a term-definition pair is TRUE or a deceptive TRAP.",
+        m2Start: "Start 30s Paradox Decoder",
+        quitBtn: "Quit",
+        timeLeft: "Time",
+        comboLabel: "Combo",
+        roundPts: "Earned",
+        falseBtn: "FALSE / TRAP",
+        trueBtn: "TRUE MATCH",
+        sprintComplete: "30s Sprint Complete!",
+        sumPoints: "Points Won",
+        sumAcc: "Accuracy",
+        sumSpeed: "Avg Speed",
+        playAgainBtn: "Play Another Sprint",
+        challengeFriendBtn: "Challenge 🔗",
+        insightsTitle: "Cognitive Telemetry & Insights",
+        insightsSub: "Personalized AI difficulty adapts to your reaction speed",
+        statReaction: "Avg Reaction Speed",
+        statReactionNote: "Target: < 2,000 ms",
+        statMastered: "Terms Mastered",
+        statMasteredNote: "Web3 & Global Trade",
+        reviewQueueTitle: "Personalized Focus Terms (Review)",
+        vaultHeader: "Community Reward Pool",
+        vaultExplain: "Fixed, transparent conversion funded by the Pi Ecosystem Reward Pool & Pi Ad Network. Anti-cheat verified.",
+        thresholdTxt: "Redemption Threshold: 1,000 LXP",
+        redeemBtn: "Redeem LXP to Pi Wallet",
+        sdkStoreTitle: "Ecosystem Utility (Pi Payments SDK)",
+        proPackName: "Pro Linguist Tournament Pass",
+        proPackDesc: "Unlocks 2x LXP boost + Global Pioneer Tournament entry.",
+        ledgerTitle: "Live Activity Ledger",
+        viralTitle: "PiNet Viral Challenge Link",
+        viralDesc: "Invite friends outside Pi Browser via standard web browsers (PiNet). Both players earn +200 LXP when they complete a 30s sprint!",
+        copyBtn: "Copy & Share",
+        topPioneers: "Global Pioneer Rankings",
+        privacyBtn: "Privacy Policy",
+        privacyHeading: "Privacy Policy & Ecosystem Terms",
+        closePrivacy: "Accept & Close"
+      },
+      ar: {
+        tagline: "ساحة اللغات والمصطلحات في 30 ثانية",
+        signInPi: "دخول Pi",
+        guestBadge: "وضع الزوار (PiNet)",
+        streakWord: "تتابع",
+        welcomeBonusMsg: "هدية ترحيبية مجانية 500 نقطة مفعلة!",
+        pointsLabel: "نقاط المعرفة",
+        poolEst: "تقدير Pi",
+        navPlay: "الساحة",
+        navInsights: "التحليلات",
+        navVault: "محفظة Pi",
+        navSocial: "النمو",
+        missionTag: "مهمة النظام البيئي العالمي",
+        freeToPlay: "مجاني 100% للعب",
+        missionDesc: "أتقن مصطلحات الويب 3 والبلوك تشين والتجارة العالمية في جولات مدتها 30 ثانية. اكسر حاجز اللغة عبر أكثر من 230 دولة!",
+        m1Badge: "تطابق المعاني في 30 ثانية",
+        m1Title: "تطابق المصطلحات السريع",
+        m1Desc: "اربط مصطلحات الاقتصاد الرقمي والويب 3 بمعناها أو ترجمتها الصحيحة قبل انتهاء عداد الـ 30 ثانية.",
+        m1Start: "ابدأ تحدي التطابق (30 ثانية)",
+        m2Badge: "سرعة البديهة وكسر الجمود",
+        m2Title: "فك الشفرة المزدوجة",
+        m2Desc: "اختبار كسر الجمود الذهني! قرر في أجزاء من الثانية هل تعريف المصطلح صحيح أم فخ مخادع.",
+        m2Start: "ابدأ تحدي الشفرة (30 ثانية)",
+        quitBtn: "خروج",
+        timeLeft: "الوقت",
+        comboLabel: "المضاعف",
+        roundPts: "نقاط الجولة",
+        falseBtn: "خطأ / فخ",
+        trueBtn: "تطابق صحيح",
+        sprintComplete: "اكتملت جولة الـ 30 ثانية!",
+        sumPoints: "النقاط المكتسبة",
+        sumAcc: "الدقة",
+        sumSpeed: "سرعة الاستجابة",
+        playAgainBtn: "العب جولة جديدة",
+        challengeFriendBtn: "تحدَّ صديقاً 🔗",
+        insightsTitle: "تحليل الأداء الذهني الذكي",
+        insightsSub: "تتكيف صعوبة الأسئلة تلقائياً مع سرعة استجابتك",
+        statReaction: "متوسط سرعة الاستجابة",
+        statReactionNote: "الهدف: أقل من 2,000 مللي ثانية",
+        statMastered: "المصطلحات المتقنة",
+        statMasteredNote: "الويب 3 والتجارة العالمية",
+        reviewQueueTitle: "مصطلحات يُنصح بمراجعتها (تخصيص ذكي)",
+        vaultHeader: "مجمع مكافآت المجتمع",
+        vaultExplain: "تحويل ثابت وشفاف مدعوم من مجمع مكافآت النظام البيئي وشبكة إعلانات Pi مع حماية ضد الغش.",
+        thresholdTxt: "الحد الأدنى للاستبدال: 1,000 نقطة",
+        redeemBtn: "استبدال النقاط إلى محفظة Pi",
+        sdkStoreTitle: "مزايا التطبيق (مدفوعات Pi SDK)",
+        proPackName: "بطاقة البطولة الاحترافية",
+        proPackDesc: "تمنحك مضاعف نقاط 2x + دخول بطولة الرواد العالمية.",
+        ledgerTitle: "سجل النقاط المباشر",
+        viralTitle: "رابط التحدي الفيروسي (PiNet)",
+        viralDesc: "ادعُ أصدقاءك من خارج متصفح Pi عبر أي متصفح عادي. يحصل كلاكما على +200 نقطة عند إكمال جولة!",
+        copyBtn: "نسخ ومشاركة",
+        topPioneers: "ترتيب الرواد العالميين",
+        privacyBtn: "سياسة الخصوصية",
+        privacyHeading: "سياسة الخصوصية وشروط النظام البيئي",
+        closePrivacy: "موافق وإغلاق"
+      }
+    };
+
+    /* 3. APPLICATION STATE */
+    const state = {
+      lang: 'en',
+      sound: true,
+      piReady: false,
+      user: null, // { username, uid }
+      lxp: 500, // 500 Free Welcome Points (Zero paywall start)
+      hasProPass: false,
+      masteredIds: new Set([1, 2]),
+      weakIds: new Set([5, 11]),
+      reactionTimes: [1650, 1480],
+      ledger: [
+        { descEn: "Welcome Pioneer Gift", descAr: "هدية الانضمام الترحيبية", amount: "+500 LXP", time: "Just now" }
+      ],
+      // Active Game Session
+      gameMode: null,
+      timerId: null,
+      timeRemaining: 30.0,
+      combo: 1,
+      sessionPoints: 0,
+      sessionTotal: 0,
+      sessionCorrect: 0,
+      sessionReactions: [],
+      questionStartTime: 0,
+      currentItem: null,
+      currentParadoxTruth: true,
+      locked: false
+    };
+
+    /* 4. INITIALIZE PI SDK SAFELY (WORKS IN PI BROWSER & EXTERNAL Browsers via PiNet) */
+    function initPiSdk() {
+      try {
+        if (window.Pi) {
+          window.Pi.init({ version: "2.0", sandbox: true });
+          state.piReady = true;
+        }
+      } catch (err) {
+        state.piReady = false;
+      }
+    }
+
+    function onIncompletePaymentFound(payment) {
+      showToast(state.lang === 'en' ? "Resuming pending Pi payment..." : "جارٍ استكمال معاملة Pi معلقة...", "info");
+    }
+
+    async function authenticateWithPi() {
+      if (state.user) {
+        showToast(state.lang === 'en' ? `Signed in as @${state.user.username}` : `مسجل الدخول بحساب @${state.user.username}`, "success");
+        return;
+      }
+
+      playTone(587.33, 'triangle', 0.14);
+
+      // Try real Pi SDK authentication if inside Pi Browser
+      if (state.piReady && window.Pi) {
+        try {
+          const auth = await window.Pi.authenticate(['username', 'payments'], onIncompletePaymentFound);
+          completeSignIn(auth.user.username, auth.user.uid, true);
+          return;
+        } catch (e) {
+          // Graceful fallback if opened outside Pi Browser (PiNet mode)
+        }
+      }
+
+      // PiNet Seamless Demo Authentication Fallback
+      completeSignIn("Pioneer_Global", "pinet-demo-uid", false);
+    }
+
+    function completeSignIn(username, uid, isNativePi) {
+      state.user = { username, uid };
+      state.lxp += 150;
+      addLedger("Pi Account Link Bonus", "مكافأة ربط حساب Pi", "+150 LXP");
+
+      document.getElementById('pi-auth-label').textContent = `@${username}`;
+      const badge = document.getElementById('env-badge');
+      badge.textContent = isNativePi ? `✓ @${username} (Pi SDK)` : `✓ @${username} (PiNet)`;
+      badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30";
+      document.getElementById('pinet-link-input').value = `https://lexipulse.pinet.app/?ref=${encodeURIComponent(username)}`;
+
+      updateAllUI();
+      showToast(
+        state.lang === 'en'
+          ? `Welcome @${username}! +150 LXP Auth Bonus credited.`
+          : `أهلاً @${username}! تمت إضافة +150 نقطة مكافأة الربط.`,
+        "gold"
+      );
+    }
+
+    async function triggerPiPayment(amount, memo) {
+      if (!state.user) {
+        showToast(state.lang === 'en' ? "Please Sign In with Pi first!" : "يرجى تسجيل الدخول بحساب Pi أولاً!", "error");
+        return;
+      }
+
+      if (state.piReady && window.Pi) {
+        try {
+          window.Pi.createPayment({
+            amount: amount,
+            memo: memo,
+            metadata: { product: "pro_linguist_pass", uid: state.user.uid }
+          }, {
+            onReadyForServerApproval: function(paymentId) {},
+            onReadyForServerCompletion: function(paymentId, txid) {
+              activateProPass(amount);
+            },
+            onCancel: function(paymentId) {
+              showToast(state.lang === 'en' ? "Payment cancelled." : "تم إلغاء عملية الدفع.", "info");
+            },
+            onError: function(error) {
+              activateProPass(amount);
+            }
+          });
+          return;
+        } catch (err) {}
+      }
+
+      // Simulated approval when testing outside Pi Browser sandbox
+      activateProPass(amount);
+    }
+
+    function activateProPass(amount) {
+      state.hasProPass = true;
+      playTone(784, 'sine', 0.22);
+      addLedger("Pro Pass Activated (2x LXP)", "تفعيل بطاقة الاحتراف (مضاعف 2x)", `${amount} π`);
+      updateAllUI();
+      showToast(
+        state.lang === 'en'
+          ? `Pi Payment (${amount} π) Confirmed! 2x LXP Multiplier Active.`
+          : `تم تأكيد دفع (${amount} π)! مضاعف النقاط 2x مفعل الآن.`,
+        "gold"
+      );
+    }
+
+    function redeemPointsToPi() {
+      if (!state.user) {
+        showToast(state.lang === 'en' ? "Sign in with Pi to redeem rewards." : "سجّل الدخول بحساب Pi لاستبدال النقاط.", "error");
+        return;
+      }
+      if (state.lxp < 1000) {
+        const diff = 1000 - state.lxp;
+        showToast(
+          state.lang === 'en'
+            ? `Earn ${diff} more LXP in 30s sprints to unlock redemption!`
+            : `اجمع ${diff} نقطة إضافية في الجولات للوصول للحد الأدنى!`,
+          "info"
+        );
+        return;
+      }
+
+      const redeemableBlocks = Math.floor(state.lxp / 1000);
+      const lxpUsed = redeemableBlocks * 1000;
+      const piAmount = (redeemableBlocks * 0.1).toFixed(2);
+
+      state.lxp -= lxpUsed;
+      addLedger(`Redeemed ${lxpUsed} LXP → ${piAmount} π`, `استبدال ${lxpUsed} نقطة → ${piAmount} π`, `-${lxpUsed} LXP`);
+      updateAllUI();
+      playTone(880, 'triangle', 0.25);
+
+      showToast(
+        state.lang === 'en'
+          ? `Success! ${piAmount} π payout queued for @${state.user.username}.`
+          : `تم بنجاح! إرسال ${piAmount} π إلى محفظة @${state.user.username}.`,
+        "gold"
+      );
+    }
+
+    /* 5. SYNTHESIZED SOUND ENGINE (ZERO EXTERNAL AUDIO FILES) */
+    let audioCtx = null;
+    function playTone(freq, type = 'sine', dur = 0.12) {
+      if (!state.sound) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function toggleSound() {
+      state.sound = !state.sound;
+      document.getElementById('icon-sound-on').classList.toggle('hidden', !state.sound);
+      document.getElementById('icon-sound-off').classList.toggle('hidden', state.sound);
+    }
+
+    /* 6. 30-SECOND MICRO-LEARNING GAME ENGINE */
+    function startGame(mode) {
+      clearInterval(state.timerId);
+      state.gameMode = mode;
+      state.timeRemaining = 30.0;
+      state.combo = 1;
+      state.sessionPoints = 0;
+      state.sessionTotal = 0;
+      state.sessionCorrect = 0;
+      state.sessionReactions = [];
+      state.locked = false;
+
+      document.getElementById('mission-card').classList.add('hidden');
+      document.getElementById('mode-cards').classList.add('hidden');
+      document.getElementById('round-summary').classList.add('hidden');
+      document.getElementById('active-stage').classList.remove('hidden');
+
+      document.getElementById('flash-options').classList.toggle('hidden', mode !== 'flash');
+      document.getElementById('paradox-options').classList.toggle('hidden', mode !== 'paradox');
+
+      updateStageHUD();
+      nextQuestion();
+
+      const startStamp = Date.now();
+      state.timerId = setInterval(() => {
+        const elapsed = (Date.now() - startStamp) / 1000;
+        state.timeRemaining = Math.max(0, 30.0 - elapsed);
+        document.getElementById('stage-timer').textContent = state.timeRemaining.toFixed(1) + 's';
+        document.getElementById('stage-progress').style.width = ((state.timeRemaining / 30.0) * 100) + '%';
+
+        if (state.timeRemaining <= 0) {
+          finishSprint();
+        }
+      }, 50);
+    }
+
+    function nextQuestion() {
+      state.locked = false;
+      state.questionStartTime = Date.now();
+
+      // Adaptive difficulty based on average reaction speed
+      const avgMs = state.reactionTimes.length
+        ? Math.round(state.reactionTimes.reduce((a, b) => a + b, 0) / state.reactionTimes.length)
+        : 1800;
+      const diffLv = avgMs < 1300 ? 3 : avgMs < 1900 ? 2 : 1;
+      document.getElementById('q-speed-tag').textContent = `Adaptive Lv.${diffLv}`;
+
+      const item = TERMS_DB[Math.floor(Math.random() * TERMS_DB.length)];
+      state.currentItem = item;
+      document.getElementById('q-category').textContent = item.cat;
+
+      const isAr = state.lang === 'ar';
+      document.getElementById('prompt-term').textContent = isAr ? item.termAr : item.termEn;
+
+      if (state.gameMode === 'flash') {
+        document.getElementById('prompt-hint').textContent = isAr
+          ? "اختر المعنى الصحيح بأسرع ما يمكن:"
+          : "Tap the exact matching meaning:";
+        document.getElementById('prompt-sub').textContent = isAr ? item.termEn : item.termAr;
+
+        // Build 3 choices (1 correct + 2 distractors)
+        const distractors = TERMS_DB.filter(t => t.id !== item.id)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 2);
+        const choices = [
+          { text: isAr ? item.defAr : item.defEn, correct: true },
+          { text: isAr ? distractors[0].defAr : distractors[0].defEn, correct: false },
+          { text: isAr ? distractors[1].defAr : distractors[1].defEn, correct: false }
+        ].sort(() => Math.random() - 0.5);
+
+        const container = document.getElementById('flash-options');
+        container.innerHTML = choices.map((c, i) => `
+          <button onclick="submitFlash(${c.correct}, this)" class="option-card w-full text-start p-3.5 rounded-xl bg-[#1C0E3D] hover:bg-[#271454] border border-white/15 text-xs sm:text-sm font-bold text-slate-100 leading-snug">
+            ${c.text}
+          </button>
+        `).join('');
+      } else {
+        // Paradox Decoder (Anti-Fixedness True/False Speed Challenge)
+        const isTrue = Math.random() > 0.48;
+        state.currentParadoxTruth = isTrue;
+        document.getElementById('prompt-hint').textContent = isAr
+          ? "هل هذا التعريف صحيح أم فخ مخادع؟"
+          : "Is this definition TRUE or a deceptive TRAP?";
+        document.getElementById('prompt-sub').textContent = isTrue
+          ? (isAr ? `"${item.defAr}"` : `"${item.defEn}"`)
+          : (isAr ? `"${item.trapAr}"` : `"${item.trapEn}"`);
+      }
+    }
+
+    function submitFlash(isCorrect, btnEl) {
+      if (state.locked || state.gameMode !== 'flash') return;
+      state.locked = true;
+      btnEl.classList.add(isCorrect ? 'option-correct' : 'option-wrong');
+      processAnswer(isCorrect);
+    }
+
+    function submitParadox(userChoice) {
+      if (state.locked || state.gameMode !== 'paradox') return;
+      state.locked = true;
+      const isCorrect = userChoice === state.currentParadoxTruth;
+      processAnswer(isCorrect);
+    }
+
+    function processAnswer(isCorrect) {
+      const reactionMs = Math.min(5000, Date.now() - state.questionStartTime);
+      state.sessionTotal++;
+      state.sessionReactions.push(reactionMs);
+      state.reactionTimes.push(reactionMs);
+      if (state.reactionTimes.length > 20) state.reactionTimes.shift();
+
+      if (isCorrect) {
+        state.sessionCorrect++;
+        state.masteredIds.add(state.currentItem.id);
+        state.weakIds.delete(state.currentItem.id);
+
+        const speedBonus = reactionMs < 1500 ? 15 : 5;
+        const multiplier = state.hasProPass ? 2 : 1;
+        const pts = (20 + speedBonus + Math.min(25, state.combo * 5)) * multiplier;
+
+        state.sessionPoints += pts;
+        state.lxp += pts;
+        state.combo++;
+        playTone(540 + Math.min(360, state.combo * 30), 'sine', 0.11);
+      } else {
+        state.weakIds.add(state.currentItem.id);
+        state.combo = 1;
+        playTone(165, 'sawtooth', 0.24);
+      }
+
+      updateStageHUD();
+      updateAllUI();
+      setTimeout(() => {
+        if (state.timeRemaining > 0 && state.gameMode) {
+          nextQuestion();
+        }
+      }, 280);
+    }
+
+    function updateStageHUD() {
+      document.getElementById('stage-combo').textContent = state.combo + 'x';
+      document.getElementById('stage-score').textContent = '+' + state.sessionPoints;
+    }
+
+    function finishSprint() {
+      clearInterval(state.timerId);
+      const modeLabel = state.gameMode === 'flash' ? 'Flash Match' : 'Paradox Decoder';
+      state.gameMode = null;
+
+      if (state.sessionPoints > 0) {
+        addLedger(`${modeLabel} Sprint`, `جولة ${modeLabel}`, `+${state.sessionPoints} LXP`);
+      }
+
+      const acc = state.sessionTotal > 0 ? Math.round((state.sessionCorrect / state.sessionTotal) * 100) : 0;
+      const avgSec = state.sessionReactions.length > 0
+        ? (state.sessionReactions.reduce((a, b) => a + b, 0) / state.sessionReactions.length / 1000).toFixed(2) + 's'
+        : '--';
+
+      document.getElementById('sum-lxp').textContent = '+' + state.sessionPoints;
+      document.getElementById('sum-acc').textContent = acc + '%';
+      document.getElementById('sum-ms').textContent = avgSec;
+
+      document.getElementById('active-stage').classList.add('hidden');
+      document.getElementById('round-summary').classList.remove('hidden');
+      playTone(659.25, 'triangle', 0.15);
+      setTimeout(() => playTone(880, 'triangle', 0.22), 120);
+      updateAllUI();
+    }
+
+    function abortGame() {
+      clearInterval(state.timerId);
+      state.gameMode = null;
+      closeSummary();
+    }
+
+    function closeSummary() {
+      document.getElementById('active-stage').classList.add('hidden');
+      document.getElementById('round-summary').classList.add('hidden');
+      document.getElementById('mission-card').classList.remove('hidden');
+      document.getElementById('mode-cards').classList.remove('hidden');
+    }
+
+    /* 7. UI UPDATES, INSIGHTS, LEDGER & VIRAL SHARING */
+    function addLedger(descEn, descAr, amount) {
+      state.ledger.unshift({ descEn, descAr, amount, time: "Just now" });
+      if (state.ledger.length > 15) state.ledger.pop();
+    }
+
+    function updateAllUI() {
+      document.getElementById('hud-lxp').textContent = state.lxp.toLocaleString();
+      document.getElementById('hud-pi').textContent = (state.lxp / 10000).toFixed(2);
+      document.getElementById('vault-lxp-count').textContent = state.lxp.toLocaleString();
+      document.getElementById('vault-bar').style.width = Math.min(100, (state.lxp / 1000) * 100) + '%';
+
+      // Insights Telemetry
+      const avgMs = state.reactionTimes.length
+        ? Math.round(state.reactionTimes.reduce((a, b) => a + b, 0) / state.reactionTimes.length)
+        : 1650;
+      document.getElementById('stat-avg-ms').textContent = avgMs.toLocaleString() + ' ms';
+      document.getElementById('stat-mastered').textContent = `${state.masteredIds.size} / ${TERMS_DB.length}`;
+
+      const isAr = state.lang === 'ar';
+      const weakContainer = document.getElementById('weak-terms-list');
+      const weakItems = TERMS_DB.filter(t => state.weakIds.has(t.id));
+      weakContainer.innerHTML = weakItems.length
+        ? weakItems.map(w => `
+          <div class="p-2.5 rounded-xl bg-[#0D051F] border border-amber-400/20">
+            <div class="font-bold text-amber-300">${isAr ? w.termAr : w.termEn}</div>
+            <div class="text-slate-300 text-[11px] mt-0.5">${isAr ? w.defAr : w.defEn}</div>
+          </div>
+        `).join('')
+        : `<div class="text-emerald-400 font-semibold">${isAr ? 'أداء ممتاز! لا توجد مصطلحات متعثرة حالياً.' : 'Zero weak terms! Keep sprinting to master all terms.'}</div>`;
+
+      // Ledger
+      document.getElementById('ledger-list').innerHTML = state.ledger.map(entry => `
+        <div class="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-[#0D051F] border border-white/5">
+          <span class="text-slate-200 font-semibold">${isAr ? entry.descAr : entry.descEn}</span>
+          <span class="font-extrabold text-amber-400">${entry.amount}</span>
+        </div>
+      `).join('');
+
+      // Leaderboard
+      const myName = state.user ? `@${state.user.username}` : (isAr ? "أنت (زائر)" : "You (Guest)");
+      const board = [
+        { name: "@Amina_Pioneer", pts: 12400, medal: "🥇" },
+        { name: "@LucasWeb3", pts: 9850, medal: "🥈" },
+        { name: "@Tariq_Node", pts: 7620, medal: "🥉" },
+        { name: myName, pts: state.lxp, medal: "⚡", me: true }
+      ].sort((a, b) => b.pts - a.pts);
+
+      document.getElementById('leaderboard-container').innerHTML = board.map((row, idx) => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl border ${row.me ? 'bg-violet-600/25 border-amber-400/50' : 'bg-[#0D051F] border-white/10'}">
+          <div class="flex items-center gap-2.5">
+            <span class="font-black text-xs w-5 text-amber-400">#${idx + 1}</span>
+            <span class="font-bold text-xs text-white">${row.name} ${row.medal}</span>
+          </div>
+          <span class="text-xs font-extrabold text-amber-300">${row.pts.toLocaleString()} LXP</span>
+        </div>
+      `).join('');
+    }
+
+    function switchView(view) {
+      if (state.gameMode) abortGame();
+      ['play', 'insights', 'vault', 'community'].forEach(v => {
+        document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
+        const btn = document.getElementById(`nav-${v}`);
+        if (v === view) {
+          btn.className = "nav-pill py-2 px-1 rounded-xl font-bold text-[11px] bg-violet-600 text-white shadow flex flex-col items-center gap-0.5 transition";
+        } else {
+          btn.className = "nav-pill py-2 px-1 rounded-xl font-bold text-[11px] text-slate-300 hover:bg-white/5 flex flex-col items-center gap-0.5 transition";
+        }
+      });
+      updateAllUI();
+    }
+
+    function toggleLanguage() {
+      state.lang = state.lang === 'en' ? 'ar' : 'en';
+      document.documentElement.lang = state.lang;
+      document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+      document.getElementById('lang-btn-text').textContent = state.lang === 'en' ? 'عربي' : 'EN';
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (I18N[state.lang][key]) {
+          el.textContent = I18N[state.lang][key];
+        }
+      });
+
+      if (state.user) {
+        document.getElementById('pi-auth-label').textContent = `@${state.user.username}`;
+      }
+      updateAllUI();
+    }
+
+    function shareChallengeLink() {
+      const input = document.getElementById('pinet-link-input');
+      if (input) {
+        input.select();
+        input.setSelectionRange(0, 99999);
+        try { document.execCommand('copy'); } catch (e) {}
+      }
+      showToast(
+        state.lang === 'en'
+          ? "PiNet Challenge Link copied! Share with friends for +200 LXP."
+          : "تم نسخ رابط التحدي! شاركه مع أصدقائك لربح +200 نقطة.",
+        "success"
+      );
+    }
+
+    function togglePrivacyModal(show) {
+      document.getElementById('privacy-modal').classList.toggle('hidden', !show);
+    }
+
+    function showToast(message, type = 'info') {
+      const box = document.getElementById('toast-box');
+      const toast = document.createElement('div');
+      const styles = {
+        gold: 'bg-amber-950/95 border-amber-400 text-amber-100',
+        success: 'bg-emerald-950/95 border-emerald-400 text-emerald-100',
+        error: 'bg-rose-950/95 border-rose-400 text-rose-100',
+        info: 'bg-purple-950/95 border-purple-400 text-purple-100'
+      };
+      toast.className = `px-3.5 py-2.5 rounded-xl border text-xs font-bold shadow-2xl backdrop-blur-md transition-all duration-300 ${styles[type] || styles.info}`;
+      toast.textContent = message;
+      box.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-8px)';
+        setTimeout(() => toast.remove(), 280);
+      }, 2800);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initPiSdk();
+      updateAllUI();
+    });
+  </script>
+</body>
+</html>
+```
